@@ -2,47 +2,47 @@
 json = require "json"
 
 class RestrictionGroup
-	new: =>
-		@allowances = {}
+    new: =>
+        @allowances = {}
 
-	addRestriction: (itemName, restricted=true) =>
+    addRestriction: (itemName, restricted=true) =>
         print("called ", itemName)
-		@allowances[itemName] = restricted
+        @allowances[itemName] = restricted
 
-	isRestricted: (itemName) =>
-		allowed = @allowances[itemName]
+    isRestricted: (itemName) =>
+        allowed = @allowances[itemName]
         return if allowed == nil
 
         return not allowed
 
-	isAllowed: (itemName) =>
-		@allowances[itemName]
+    isAllowed: (itemName) =>
+        @allowances[itemName]
 
 
 class WeaponRestrictionGroup extends RestrictionGroup
-	@type: "WEAPON"
+    @type: "WEAPON"
 
 class ToolRestrictionGroup extends RestrictionGroup
-	@type: "TOOL"
+    @type: "TOOL"
 
 class EntityRestrictionGroup extends RestrictionGroup
-	@type: "ENTITY"
+    @type: "ENTITY"
 
 class ModelRestrictionGroup extends RestrictionGroup
-	@type: "MODEL"
+    @type: "MODEL"
 
 newRestrictionGroupSet = () -> {
-	[WeaponRestrictionGroup.type]: WeaponRestrictionGroup(),
-	[ToolRestrictionGroup.type]: ToolRestrictionGroup(),
-	[EntityRestrictionGroup.type]: EntityRestrictionGroup()
+    [WeaponRestrictionGroup.type]: WeaponRestrictionGroup(),
+    [ToolRestrictionGroup.type]: ToolRestrictionGroup(),
+    [EntityRestrictionGroup.type]: EntityRestrictionGroup()
 }
 
 
 class UserGroups
-	@groups: {}
+    @groups: {}
 
-	register: (uuid, group) =>
-		@@groups[uuid] = group
+    register: (uuid, group) =>
+        @@groups[uuid] = group
 
     serialize: () =>
         groups = {}
@@ -56,15 +56,15 @@ class UserGroups
         json.encode groups
 
 newUserGroup = () =>
-	-- TODO: UUID
+    -- TODO: UUID
 
 
-class UserGroup
-	@restrictions: newRestrictionGroupSet!
+    class UserGroup
+        @restrictions: newRestrictionGroupSet!
 
-	new: (@name, @parent) =>
+    new: (@name, @parent) =>
         @uuid = tostring(math.random( 1, 1000000)) -- TODO use uuid
-		UserGroups\register @uuid, @
+        UserGroups\register @uuid, @
 
 
     addRestriction: (type, itemName, value) =>
