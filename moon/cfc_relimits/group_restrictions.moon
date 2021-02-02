@@ -5,8 +5,8 @@ class RestrictionGroup
     new: =>
         @allowances = {}
 
-    addRestriction: (itemName, restricted=true) =>
-        print("called ", itemName)
+    setRestricted: (itemName, restricted=true) =>
+        print "called ", itemName
         @allowances[itemName] = restricted
 
     isRestricted: (itemName) =>
@@ -32,9 +32,9 @@ class ModelRestrictionGroup extends RestrictionGroup
     @type: "MODEL"
 
 newRestrictionGroupSet = () -> {
-    [WeaponRestrictionGroup.type]: WeaponRestrictionGroup(),
-    [ToolRestrictionGroup.type]: ToolRestrictionGroup(),
-    [EntityRestrictionGroup.type]: EntityRestrictionGroup()
+    [WeaponRestrictionGroup.type]: WeaponRestrictionGroup!,
+    [ToolRestrictionGroup.type]: ToolRestrictionGroup!,
+    [EntityRestrictionGroup.type]: EntityRestrictionGroup!
 }
 
 
@@ -46,32 +46,32 @@ class UserGroups
 
     serialize: () =>
         groups = {}
+
         for _, group in pairs @@groups
             table.insert groups, {
-                uuid: group.uuid,
-                name: group.name,
+                uuid: group.uuid
+                name: group.name
                 inherits: group.parent and group.parent.uuid
-                restrictions: { k, v.allowances for k, v in pairs group\getRestrictions! },
+                restrictions: { k, v.allowances for k, v in pairs group\getRestrictions! }
             }
+
         json.encode groups
 
 newUserGroup = () =>
     -- TODO: UUID
 
-
     class UserGroup
         @restrictions: newRestrictionGroupSet!
 
     new: (@name, @parent) =>
-        @uuid = tostring(math.random( 1, 1000000)) -- TODO use uuid
-        UserGroups\register @uuid, @
+        @uuid = tostring(math.random(1, 1000000)) -- TODO use uuid
+        UserGroups\register @uuid, self
 
-
-    addRestriction: (type, itemName, value) =>
+    setRestricted: (type, itemName, restricted) =>
         restrictionsGroup = @@restrictions[type]
         return unless restrictionsGroup
 
-        restrictionsGroup\addRestriction itemName, value
+        restrictionsGroup\setRestricted itemName, restricted
 
     isAllowed: (type, itemName) =>
         restrictionsGroup = @@restrictions[type]
@@ -79,16 +79,15 @@ newUserGroup = () =>
 
         return restrictionsGroup\isAllowed itemName, "test"
 
-    getRestrictions: () =>
-        @@restrictions
+    getRestrictions: () => @@restrictions
 
 -- example
 user = UserGroup "user"
-user\addRestriction  "WEAPON", "m9k_davy_crocket", false
-user\addRestriction "WEAPON", "m9k_minigun", false
+user\setRestricted  "WEAPON", "m9k_davy_crocket", false
+user\setRestricted "WEAPON", "m9k_minigun", false
 
 regular = UserGroup "regular", user
-regular\addRestriction "WEAPON", "m9k_minigun", true
+regular\setRestricted "WEAPON", "m9k_minigun", true
 
 print "regular minigun", UserGroup\isAllowed "WEAPON", "m9k_minigun"
 print "regular davy crocket", UserGroup\isAllowed "WEAPON", "m9k_davy_crocket"
