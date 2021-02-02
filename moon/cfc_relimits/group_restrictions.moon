@@ -20,21 +20,21 @@ class RestrictionGroup
 
 
 class WeaponRestrictionGroup extends RestrictionGroup
-    @type: "WEAPON"
+    @restrictionType: "WEAPON"
 
 class ToolRestrictionGroup extends RestrictionGroup
-    @type: "TOOL"
+    @restrictionType: "TOOL"
 
 class EntityRestrictionGroup extends RestrictionGroup
-    @type: "ENTITY"
+    @restrictionType: "ENTITY"
 
 class ModelRestrictionGroup extends RestrictionGroup
-    @type: "MODEL"
+    @restrictionType: "MODEL"
 
 newRestrictionGroupSet = () -> {
-    [WeaponRestrictionGroup.type]: WeaponRestrictionGroup!,
-    [ToolRestrictionGroup.type]: ToolRestrictionGroup!,
-    [EntityRestrictionGroup.type]: EntityRestrictionGroup!
+    [WeaponRestrictionGroup.restrictionType]: WeaponRestrictionGroup!
+    [ToolRestrictionGroup.restrictionType]: ToolRestrictionGroup!
+    [EntityRestrictionGroup.restrictionType]: EntityRestrictionGroup!
 }
 
 
@@ -67,14 +67,14 @@ newUserGroup = () =>
         @uuid = tostring(math.random(1, 1000000)) -- TODO use uuid
         UserGroups\register @uuid, self
 
-    setRestricted: (type, itemName, restricted) =>
-        restrictionsGroup = @@restrictions[type]
+    setRestricted: (restrictionType, itemName, restricted) =>
+        restrictionsGroup = @@restrictions[restrictionType]
         return unless restrictionsGroup
 
         restrictionsGroup\setRestricted itemName, restricted
 
-    isAllowed: (type, itemName) =>
-        restrictionsGroup = @@restrictions[type]
+    isAllowed: (restrictionType, itemName) =>
+        restrictionsGroup = @@restrictions[restrictionType]
         return unless restrictionsGroup
 
         return restrictionsGroup\isAllowed itemName, "test"
