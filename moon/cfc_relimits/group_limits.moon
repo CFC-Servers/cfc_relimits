@@ -1,4 +1,3 @@
--- class Restrictions
 json = require "json"
 exampleJson = require "example_json"
 
@@ -6,14 +5,13 @@ math.randomseed(os.time())
 
 istable = (v) -> type(v) == "table"
 
-
 newUUID = ->
     bytes = {}
     for i = 1, 16 do
         bytes[i] = math.random(1, 256)
 
     return string.format("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-        bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], math.floor((bytes[7] / 16) + 64), bytes[8], 
+        bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], math.floor((bytes[7] / 16) + 64), bytes[8],
         math.floor((bytes[9] / 4) + 128), bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15], bytes[16])
 
 tableMerge = ( dest, source ) ->
@@ -25,44 +23,23 @@ tableMerge = ( dest, source ) ->
 
     return dest
 
-class RestrictionGroup
-    new: =>
-        @allowances = {}
+class LimitationGroup
+    @limitTypes =
+        "WEAPON"
+        "TOOL"
+        "ENTITY"
+        "MODEL"
 
-    setRestricted: (itemName, restricted=true) =>
-        @allowances[itemName] = restricted
+    new: (@limitType) =>
+        @limits = {}
 
-    isRestricted: (itemName) =>
-        allowed = @allowances[itemName]
-        return if allowed == nil
+    updateLimits: (limits) =>
+        @limits = tableMerge @limits, limits
 
-        return not allowed
+    getLimit: (itemName) =>
+        @limits[itemName]
 
-    isAllowed: (itemName) =>
-        @allowances[itemName]
-
-class WeaponRestrictionGroup extends RestrictionGroup
-    @restrictionType: "WEAPON"
-
-class ToolRestrictionGroup extends RestrictionGroup
-    @restrictionType: "TOOL"
-
-class EntityRestrictionGroup extends RestrictionGroup
-    @restrictionType: "ENTITY"
-
-class ModelRestrictionGroup extends RestrictionGroup
-    @restrictionType: "MODEL"
-
-newRestrictionGroupSet = () -> {
-    [WeaponRestrictionGroup.restrictionType]: WeaponRestrictionGroup!
-    [ToolRestrictionGroup.restrictionType]: ToolRestrictionGroup!
-    [EntityRestrictionGroup.restrictionType]: EntityRestrictionGroup!
-    [ModelRestrictionGroup.restrictionType]: ModelRestrictionGroup!
-}
-
-local UserGroup
-
-class UserGroups
+class UserGroupManager
     @groups: {}
 
     register: (uuid, group) =>
@@ -81,7 +58,7 @@ class UserGroups
                 uuid: group.uuid
                 name: group.name
                 inherits: group.parent and group.parent.uuid
-                restrictions: { k, v.allowances for k, v in pairs group.restrictions }
+                limits: { k, v.limits for k, v in pairs group.limits }
             }
 
         json.encode groups
@@ -95,10 +72,10 @@ class UserGroups
             parent = groupData.inherits and @@groups[groupData.inherits]
             newGroup = UserGroup groupData.name, parent, groupData.uuid
 
-            -- load allowances
-            for restrictionType, allowances in pairs groupData.restrictions
-                restrictionGroup = newGroup.restrictions[restrictionType]
-                restrictionGroup.allowances = allowances
+            -- load limits
+            for limitType, limits in pairs groupData.limits
+                limitationGroup = newGroup.limits[limitType]
+                limitationGroup.limits = limits
 
             -- handle parent not being loaded
             if not parent and groupData.inherits
@@ -109,49 +86,54 @@ class UserGroups
                 onLoaded[newGroup.uuid] newGroup
 
 class UserGroup
-    new: (@name, @parent, @uuid=newUUID()) =>
-        @restrictions = newRestrictionGroupSet!
-        UserGroups\register @uuid, self
+    new: (@name, @parent, @uuid=newUUID!, @limits=@generateLimits!) =>
+        UserGroupManager\register @uuid, self
+        @compiledLimits = nil
+
+    generateLimits: =>
+        { limitType, LimitationGroup(limitType) for limitType in *LimitationGroup.limitTypes }
 
     setParent: (parent) =>
         @parent = parent
+        @parent.children or= {}
+        table.insert @parent.children, self
 
-    setRestricted: (restrictionType, itemName, restricted) =>
-        restrictionsGroup = @restrictions[restrictionType]
-        return unless restrictionsGroup
+    updateLimits: (limitType, limits) =>
+        limitGroups = @limits[limitType]
+        return unless limitGroups
 
-        restrictionsGroup\setRestricted itemName, restricted
+        limitGroups\updateLimits limits
 
-    isAllowed: (restrictionType, itemName) =>
-        restrictionsGroup = @restrictions[restrictionType]
-        return unless restrictionsGroup
+        return unless @children
 
-        isAllowed = restrictionsGroup\isAllowed itemName
+        for child in *@children
+            child.compiledLimits = nil
 
-        return isAllowed unless isAllowed == nil
+    getLimits: () =>
+        return @compiledLimits if @compiledLimits
 
-        return @parent\isAllowed restrictionType, itemName unless @parent == nil
+        parentLimits = @parent and @parent\getLimits!
+        compiledLimits = tableMerge (parentLimits or {}), @limits
+        @compiledLimits = compiledLimits
 
-    getRestrictions: () =>
-        parentRestrictions = @parent and @parent\getRestrictions!
-        tableMerge(parentRestrictions or {}, @restrictions)
+        return compiledLimits
 
 -- example
 
 exampleDeserialize = () ->
-    -- UserGroups\deserialize [==[
+    -- UserGroupManager\deserialize [==[
     -- [{"uuid":"394383","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":true}},"name":"regular","inherits":"840188"},{"uuid":"840188","name":"user","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":false,"m9k_davy_crocket":false}}}]
     -- ]==]
-    UserGroups\deserialize exampleJson
+    UserGroupManager\deserialize exampleJson
 
     groups = { "1", "2", "3", "4" }
 
     for uuid in *groups
-        group = UserGroups.groups[uuid]
+        group = UserGroupManager.groups[uuid]
         groupName = group.name
 
-        for restrictionType, allowances in pairs group\getRestrictions!
-            print groupName, restrictionType
+        for limitType, allowances in pairs group\getLimits!
+            print groupName, limitType
 
             for name, isAllowed in pairs allowances.allowances
                 print "  #{name}: #{isAllowed}"
@@ -174,7 +156,7 @@ exampleGroupCreation = () ->
     print "regular davy crocket", regular\isAllowed "WEAPON", "m9k_davy_crocket"
     print "regular random gun", regular\isAllowed "WEAPON", "random_gun"
 
-    print UserGroups\serialize!
+    print UserGroupManager\serialize!
 
 -- exampleGroupCreation!
 exampleDeserialize!
