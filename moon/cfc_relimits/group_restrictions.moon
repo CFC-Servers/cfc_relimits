@@ -1,7 +1,19 @@
 -- class Restrictions
 json = require "json"
+exampleJson = require "example_json"
 
 math.randomseed(os.time())
+
+istable = (v) -> type(v) == "table"
+
+tableMerge = ( dest, source ) ->
+    for k, v in pairs( source )
+        if ( istable( v ) and istable( dest[ k ] ) ) then
+            tableMerge( dest[ k ], v )
+        else
+            dest[ k ] = v
+
+    return dest
 
 class RestrictionGroup
     new: =>
@@ -35,6 +47,7 @@ newRestrictionGroupSet = () -> {
     [WeaponRestrictionGroup.restrictionType]: WeaponRestrictionGroup!
     [ToolRestrictionGroup.restrictionType]: ToolRestrictionGroup!
     [EntityRestrictionGroup.restrictionType]: EntityRestrictionGroup!
+    [ModelRestrictionGroup.restrictionType]: ModelRestrictionGroup!
 }
 
 local UserGroup
@@ -44,7 +57,7 @@ class UserGroups
 
     register: (uuid, group) =>
         @@groups[uuid] = group
-    
+
     getUserGroup: (groupName) =>
         for _, group in pairs @@groups
             if group.name == groupName
@@ -109,22 +122,35 @@ class UserGroup
 
         return @parent\isAllowed restrictionType, itemName unless @parent == nil
 
-    getRestrictions: () => @restrictions
-
+    getRestrictions: () =>
+        parentRestrictions = @parent and @parent\getRestrictions!
+        tableMerge(parentRestrictions or {}, @restrictions)
 
 -- example
 
 exampleDeserialize = () ->
-    UserGroups\deserialize [==[
-    [{"uuid":"394383","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":true}},"name":"regular","inherits":"840188"},{"uuid":"840188","name":"user","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":false,"m9k_davy_crocket":false}}}]
-    ]==]
+    -- UserGroups\deserialize [==[
+    -- [{"uuid":"394383","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":true}},"name":"regular","inherits":"840188"},{"uuid":"840188","name":"user","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":false,"m9k_davy_crocket":false}}}]
+    -- ]==]
+    UserGroups\deserialize exampleJson
 
-    regular = UserGroups\getUserGroup("regular")
-    print "regular minigun", regular\isAllowed "WEAPON", "m9k_minigun"
-    print "regular davy crocket", regular\isAllowed "WEAPON", "m9k_davy_crocket"
-    print "regular random gun", regular\isAllowed "WEAPON", "random_gun"
-    
-    print UserGroups\serialize!
+    groups = { "1", "2", "3", "4" }
+
+    for uuid in *groups
+        group = UserGroups.groups[uuid]
+        groupName = group.name
+
+        for restrictionType, allowances in pairs group\getRestrictions!
+            print groupName, restrictionType
+
+            for name, isAllowed in pairs allowances.allowances
+                print "  #{name}: #{isAllowed}"
+
+            print ""
+
+        print ""
+        print "-------------------------------------------------------"
+        print ""
 
 exampleGroupCreation = () ->
     user = UserGroup "user"
