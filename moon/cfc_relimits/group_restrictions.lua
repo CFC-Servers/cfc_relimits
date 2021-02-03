@@ -5,6 +5,14 @@ local istable
 istable = function(v)
   return type(v) == "table"
 end
+local newUUID
+newUUID = function()
+  local bytes = { }
+  for i = 1, 16 do
+    bytes[i] = math.random(1, 256)
+  end
+  return string.format("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x", bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], math.floor((bytes[7] / 16) + 64), bytes[8], math.floor((bytes[9] / 4) + 128), bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15], bytes[16])
+end
 local tableMerge
 tableMerge = function(dest, source)
   for k, v in pairs(source) do
@@ -248,7 +256,7 @@ do
           inherits = group.parent and group.parent.uuid,
           restrictions = (function()
             local _tbl_0 = { }
-            for k, v in pairs(group:getRestrictions()) do
+            for k, v in pairs(group.restrictions) do
               _tbl_0[k] = v.allowances
             end
             return _tbl_0
@@ -331,7 +339,7 @@ do
   _class_0 = setmetatable({
     __init = function(self, name, parent, uuid)
       if uuid == nil then
-        uuid = math.random(1, 1000000000000000)
+        uuid = newUUID()
       end
       self.name, self.parent, self.uuid = name, parent, uuid
       self.restrictions = newRestrictionGroupSet()
@@ -387,4 +395,4 @@ exampleGroupCreation = function()
   print("regular random gun", regular:isAllowed("WEAPON", "random_gun"))
   return print(UserGroups:serialize())
 end
-return exampleDeserialize()
+return exampleGroupCreation()
