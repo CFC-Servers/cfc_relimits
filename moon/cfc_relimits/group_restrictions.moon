@@ -71,7 +71,7 @@ class UserGroups
                 uuid: group.uuid
                 name: group.name
                 inherits: group.parent and group.parent.uuid
-                restrictions: { k, v.allowances for k, v in pairs group\getRestrictions! }
+                restrictions: { k, v.allowances for k, v in pairs group.restrictions }
             }
 
         json.encode groups
