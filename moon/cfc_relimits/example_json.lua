@@ -5,18 +5,18 @@ local theJson = [[
 		"inherits": "",
 		"uuid": "1",
 		"name": "Devotee",
-		"restrictions": {
+		"limits": {
 			"WEAPON": {
-				"weapon_m9": true
+				"weapon_m9": 0
 			},
 			"TOOL": {
-				"adv_dupe_2": false
+				"adv_dupe_2": 0
 			},
 			"ENTITY": {
-				"exploding_barrel_lel": true
+				"sent_explosive": 50
 			},
 			"MODEL": {
-				"gman": false
+				"gman.mdl": 0
 			}
 		}
 	},
@@ -24,18 +24,17 @@ local theJson = [[
 		"inherits": "1",
 		"uuid": "2",
 		"name": "Nerds",
-		"restrictions": {
+		"limits": {
 			"WEAPON": {
-				"weapon_m9": false,
-				"weapon_m8": true
+				"weapon_m9": 1
 			},
 			"TOOL": {
-				"adv_dupe_2": true
+				"adv_dupe_2": 1
 			},
 			"ENTITY": {
 			},
 			"MODEL": {
-				"gman": false
+				"gman.mdl": 0
 			}
 		}
 	},
@@ -43,12 +42,12 @@ local theJson = [[
 		"inherits": "2",
 		"uuid": "3",
 		"name": "Exalted",
-		"restrictions": {
+		"limits": {
 			"WEAPON": {
-			    "weapon_m9": true
+			    "weapon_m9": 1
 			},
 			"TOOL": {
-			    "simfphys_filler": true
+			    "simfphys_filler": 1
 			},
 			"ENTITY": {
 			},
@@ -60,19 +59,19 @@ local theJson = [[
 		"inherits": "2",
 		"uuid": "4",
 		"name": "Super",
-		"restrictions": {
+		"limits": {
 			"WEAPON": {
-			    "weapon_nuke": false
+			    "weapon_nuke": 0
 			},
 			"TOOL": {
-			    "wire_adv": false
+			    "wire_adv": 0
 			},
 			"ENTITY": {
-			    "sent_nuke": false
+			    "sent_nuke": 0
 			},
 			"MODEL": {
-			    "phxbomb.mdl": false,
-			    "gman": true
+			    "phxbomb.mdl": 0,
+			    "gman.mdl": true
 			}
 		}
 	}
