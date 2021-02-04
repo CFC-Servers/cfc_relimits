@@ -1,4 +1,4 @@
-hook.Add "CanTool", "ReLimits_CanTool", (ply, _, toolName) ->
+ canTool = (ply, _, toolName) ->
     return unless IsValid ply
     tracker = ply.TrackerManager\getTracker "TOOL"
 
@@ -9,3 +9,5 @@ hook.Add "CanTool", "ReLimits_CanTool", (ply, _, toolName) ->
     tracker\incr toolName
 
     return nil
+
+hook.Add "CanTool", "ReLimits_CanTool", canTool, HOOK_LOW
