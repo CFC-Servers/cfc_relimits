@@ -1,4 +1,7 @@
--- TODO: Set up the trackers on player spawn
+-- TODO: Set/lua/betterchat/shared/sh_util.hc up the trackers on player spawn
+import min from math
+
+min: mathMin = math
 
 class LimitTypeTrackerManager =>
     -- TODO: Should this get the group from the player?
@@ -25,17 +28,26 @@ class LimitTypeTrackerManager =>
 class LimitTypeTracker
     new: (@limitType, @manager) =>
         @counts = {}
+        @timeFrameStarts = {}
 
     set: (identifier, value) =>
         @counts[identifier] = value
 
     change: (identifier, amount) =>
+        return if amount == 0
         @counts[identifier] or= 0
 
-        if @counts[identifier] + amount <= 0
-            return @counts[identifier] = 0
+        currentCount = @counts[identifier]
+        newCount = currentCount + amount
 
-        @counts[identifier] += amount
+        if newCount <= 0
+            @counts[identifier] = 0
+            return
+
+        if currentCount == 0
+            @timeFrameStarts[identifier] = CurTime!
+
+        @counts[identifier] = newCount
 
     incr: (identifier) =>
         @change identifier, 1
@@ -43,7 +55,19 @@ class LimitTypeTracker
     decr: (identifier) =>
         @change identifier, -1
 
-    getCounts: (identifier) =>
-        max: @manager\getLimit @limitType, identifier
-        current: @counts[identifier] or 0
+    getLimitData: (identifier) =>
+        @manager\getLimitData @limitType, identifier
 
+    getCounts: (identifier) =>
+        limitData = @getLimitData!
+        :timeFrame, max: maxCount = limitData
+
+        current = @counts[identifier] or 0
+        timeFrameStart = @timeFrameStarts[identifier] or 0
+
+        if CurTime! > timeFrameStart + timeFrame
+            current = 0
+            @counts[identifier] = 0
+
+        current = mathMin current, maxCount
+        :current, :max, :limitData

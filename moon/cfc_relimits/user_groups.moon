@@ -10,7 +10,7 @@ class UserGroupManager
                 return group
 
     getUserGroup: (uuid) =>
-        @@groups[uuid]
+        @@groups
 
     serialize: () =>
         groups = {}
