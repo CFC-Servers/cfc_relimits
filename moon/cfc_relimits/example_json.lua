@@ -2,8 +2,7 @@ local theJson = [[
 [
 
 	{
-		"inherits": "",
-		"uuid": "1",
+		"inherits": "", "uuid": "1",
 		"name": "Devotee",
 		"limits": {
 			"WEAPON": {

@@ -1,4 +1,4 @@
- canTool = (ply, _, toolName) ->
+canTool = (ply, _, toolName) ->
     return unless IsValid ply
     tracker = ply.TrackerManager\getTracker "TOOL"
 

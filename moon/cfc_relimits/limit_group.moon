@@ -14,5 +14,5 @@ class LimitGroup
         @limits = tableMerge @limits, limits
 
     getLimit: (itemName) =>
+        -- { max: int, timeFrame: seconds }
         @limits[itemName]
-
