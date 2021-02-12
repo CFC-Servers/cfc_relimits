@@ -6,16 +6,18 @@ local theJson = [[
 		"name": "Devotee",
 		"limits": {
 			"WEAPON": {
-				"weapon_m9": 0
-			},
-			"TOOL": {
-				"adv_dupe_2": 0
+				"weapon_m9": {
+					{ "max": 5, "timeFrame": 60 }
+				}
+				"*": {
+					{ "max": 10, "timeFrame": 60 }
+				}
 			},
 			"ENTITY": {
-				"sent_explosive": 50
-			},
-			"MODEL": {
-				"gman.mdl": 0
+				"prop_physics": {
+					"aiwudhauwd": { "max": 100, "timeFrame": 0 },
+					"0o9quwdpoiajend0aeif": { "max": 5, "timeFrame": 1 }
+				}
 			}
 		}
 	},
@@ -24,16 +26,10 @@ local theJson = [[
 		"uuid": "2",
 		"name": "Nerds",
 		"limits": {
-			"WEAPON": {
-				"weapon_m9": 1
-			},
-			"TOOL": {
-				"adv_dupe_2": 1
-			},
 			"ENTITY": {
-			},
-			"MODEL": {
-				"gman.mdl": 0
+				"prop_physics": {
+					"0o9quwdpoiajend0aeif": { "max": 100000 }
+				}
 			}
 		}
 	},
