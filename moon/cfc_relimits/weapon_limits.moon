@@ -5,7 +5,8 @@ canUseWeapon = (ply, weaponClass) ->
     tracker = ply.TrackerManager\getTracker "WEAPON"
 
     allowed = tracker\isAllowed weaponClass
-    return false if not allowed
+    allowedWild = tracker\isAllowed "*"
+    return false if not (allowed or allowedWild)
 
     return nil
 

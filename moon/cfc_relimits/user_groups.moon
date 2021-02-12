@@ -1,3 +1,8 @@
+--TODO: Fix inheritance for multiple limits
+--provide an interface for adding a limit, which will ensure a uuid is specified for that limit
+--when the compiledLimits table is created, merge over that uuid (using the uuid as the key),
+--this will mean changing any code that uses the limits list, or discard the uuid after the limits are compiled (but still store the uuid in the limit)
+
 class UserGroupManager
     @groups: {}
     @nameLookup: {}
@@ -7,17 +12,15 @@ class UserGroupManager
         @nameLookup[group.name] = group
 
     GetPlayerLimits: (ply) =>
-        --TODO: What do we do if we don't have a group object for this team, fallback to user? ensure it ever happens?
-        group = @nameLookup[ply\GetUserGroup!]
+        --TODO: What do we do if we don't have a group object for this team, fallback to user? ensure it never happens?
+        group = @GetUserGroup @GetUserGroupName ply
         group and group\getLimits!
 
-    FindUserGroup: (groupName) =>
-        for _, group in pairs @groups
-            if group.name == groupName
-                return group
+    GetUserGroupName: (ply) =>
+        ply\GetUserGroup!
 
-    GetUserGroup: (uuid) =>
-        @groups
+    GetUserGroup: (groupIdentifier) =>
+        @groups[groupIdentifier] or @nameLookup[groupIdentifier]
 
     Serialize: () =>
         groups = {}
