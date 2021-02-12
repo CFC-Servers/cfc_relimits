@@ -1,15 +1,11 @@
--- TODO: Set up the trackers on player spawn
-min = math.min
+mathMin = math.min
 
 class LimitTypeTrackerManager =>
-    -- TODO: Should this get the group from the player?
-    new: (@ply, @group) =>
-        -- TODO: Make sure there's only one of these
-        -- TODO: Store this on the player
+    new: (@ply) =>
+        if ply.TrackerManager
+            error "Attempted to add second tracker manager to player " .. tostring ply
+        ply.TrackerManager = @
         @typeTrackers = {}
-
-    plyGroup: =>
-        @ply\GetUserGroup!
 
     -- TODO: Should these getters/setters have "tracker" in the name?
     -- Is this doing too much?
@@ -21,31 +17,41 @@ class LimitTypeTrackerManager =>
         @typeTrackers[trackerType]
 
     getLimit: (limitType, identifier) =>
-        @group\getLimits![limitType][identifier]
+        UserGroupManager\GetPlayerLimits(@ply)\getLimits![limitType][identifier]
 
 class LimitTypeTracker
     new: (@limitType, @manager) =>
         @counts = {}
         @timeFrameStarts = {}
+        @manager\addTracker @limitType, @
 
     set: (identifier, value) =>
-        @counts[identifier] = value
+        limitDataList = @getLimitData!
+        currentCounts = @counts[identifier] or {}
+        for i = 1, #limitDataList
+            currentCounts[i] = value
+        @counts[identifier] = currentCounts
 
     change: (identifier, amount) =>
         return if amount == 0
-        @counts[identifier] or= 0
+        @counts[identifier] or= {}
 
-        currentCount = @counts[identifier]
-        newCount = currentCount + amount
+        curTime = CurTime!
 
-        if newCount <= 0
-            @counts[identifier] = 0
-            return
+        limitDataList = @getLimitData!
 
-        if currentCount == 0
-            @timeFrameStarts[identifier] = CurTime!
+        currentCounts = @counts[identifier]
+        for i = 1, #limitDataList
+            currentCount = currentCounts[i] or 0
+            newCount = currentCount + amount
 
-        @counts[identifier] = newCount
+            if newCount <= 0
+                currentCounts[i] = 0
+            else
+                if currentCount == 0
+                    @timeFrameStarts[identifier] or= {}
+                    @timeFrameStarts[identifier][i] = curTime
+                currentCounts[i] = newCount
 
     incr: (identifier) =>
         @change identifier, 1
@@ -56,16 +62,60 @@ class LimitTypeTracker
     getLimitData: (identifier) =>
         @manager\getLimitData @limitType, identifier
 
+    isAllowed: (identifier) =>
+        limitDataList = @getLimitData!
+
+        :comparator, :default = LimitGroup.limitTypes[@limitType]
+
+        currents = @counts[identifier] or {}
+        timeFrameStarts = @timeFrameStarts[identifier] or {}
+
+        allowed = nil
+
+        curTime = CurTime!
+
+        for i = 1, #limitDataList
+            limitData = limitDataList[i]
+
+            :timeFrame, max: maxCount = limitData
+            current = currents[i] or 0
+            timeFrameStart = timeFrameStarts[i] or 0
+
+            if timeFrame > 0 and curTime > timeFrameStart + timeFrame
+                current = 0
+                currents[i] = 0
+
+            allowed = comparator (mathMin current, maxCount), maxCount
+
+            false if not allowed
+
+        allowed or default
+
     getCounts: (identifier) =>
-        limitData = @getLimitData!
-        :timeFrame, max: maxCount = limitData
+        limitDataList = @getLimitData!
 
-        current = @counts[identifier] or 0
-        timeFrameStart = @timeFrameStarts[identifier] or 0
+        currents = @counts[identifier] or {}
+        timeFrameStarts = @timeFrameStarts[identifier] or {}
 
-        if CurTime! > timeFrameStart + timeFrame
-            current = 0
-            @counts[identifier] = 0
+        curTime = CurTime!
 
-        current = mathMin current, maxCount
-        :current, :max, :limitData
+        out = {}
+
+        for i, limitData in pairs limitDataList
+            :timeFrame, max: maxCount = limitData
+            current = currents[i] or 0
+            timeFrameStart = timeFrameStarts[i] or 0
+
+            if timeFrame > 0 and curTime > timeFrameStart + timeFrame
+                current = 0
+                currents[i] = 0
+
+            out[i] = current: (mathMin current, maxCount), max: maxCount
+
+        out
+
+hook.Add "PlayerInitialSpawn", "ReLimits_CreateTrackerManager", (ply) ->
+    manager = LimitTypeTrackerManager ply
+
+    for limitType in pairs LimitGroup.limitTypes
+        LimitTypeTracker limitType, manager
