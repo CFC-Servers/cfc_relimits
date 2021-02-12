@@ -1,21 +1,28 @@
 class UserGroupManager
     @groups: {}
+    @nameLookup: {}
 
-    register: (uuid, group) =>
-        @@groups[uuid] = group
+    Register: (uuid, group) =>
+        @groups[uuid] = group
+        @nameLookup[group.name] = group
 
-    findUserGroup: (groupName) =>
-        for _, group in pairs @@groups
+    GetPlayerLimits: (ply) =>
+        --TODO: What do we do if we don't have a group object for this team, fallback to user? ensure it ever happens?
+        group = @nameLookup[ply\GetUserGroup!]
+        group and group\getLimits!
+
+    FindUserGroup: (groupName) =>
+        for _, group in pairs @groups
             if group.name == groupName
                 return group
 
-    getUserGroup: (uuid) =>
-        @@groups
+    GetUserGroup: (uuid) =>
+        @groups
 
-    serialize: () =>
+    Serialize: () =>
         groups = {}
 
-        for _, group in pairs @@groups
+        for _, group in pairs @groups
             table.insert groups, {
                 uuid: group.uuid
                 name: group.name
@@ -25,13 +32,13 @@ class UserGroupManager
 
         json.encode groups
 
-    deserialize: (data) =>
+    Deserialize: (data) =>
         decodedData = json.decode data
 
         onLoaded = {}
 
         for _, groupData in pairs decodedData
-            parent = groupData.inherits and @@groups[groupData.inherits]
+            parent = groupData.inherits and @groups[groupData.inherits]
             newGroup = UserGroup groupData.name, parent, groupData.uuid
 
             -- load limits
@@ -49,12 +56,12 @@ class UserGroupManager
 
 class UserGroup
     new: (@name, @parent, @uuid=newUUID!, @limits=@generateLimits!) =>
-        UserGroupManager\register @uuid, self
+        UserGroupManager\Register @uuid, self
         @compiledLimits = nil
 
     generateLimits: =>
         -- TODO: Give these to the user group on creation - it shouldn't have to do this
-        { limitType, LimitGroup(limitType) for limitType in *LimitGroup.limitTypes }
+        { limitType, LimitGroup limitType for limitType in pairs LimitGroup.limitTypes }
 
     setParent: (parent) =>
         @parent = parent

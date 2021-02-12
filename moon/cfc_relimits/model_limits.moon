@@ -1,12 +1,15 @@
--- TODO: Add "MODEL" to the limit types?
+LimitGroup.Register "MODEL", (current, max) -> current < max, true
+
 hook.Add "PlayerSpawnObject", "ReLimits_CanSpawn", (ply, model) ->
     return unless model
 
     tracker = ply.TrackerManager\getTracker "MODEL"
 
-    counts = tracker\getCounts model
-    if counts.max and counts.current >= counts.max
-        return false
+    --TODO: Does the end user do this themselves? or does isAllowed check "*" implicitly
+    allowed = tracker\isAllowed model
+    allowedWild = tracker\isAllowed "*"
+
+    return false if not (allowed and allowedWild)
 
     return nil
 

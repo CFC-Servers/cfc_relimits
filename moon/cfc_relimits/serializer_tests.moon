@@ -5,7 +5,7 @@ exampleDeserialize = () ->
     -- UserGroupManager\deserialize [==[
     -- [{"uuid":"394383","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":true}},"name":"regular","inherits":"840188"},{"uuid":"840188","name":"user","restrictions":{"ENTITY":[],"TOOL":[],"WEAPON":{"m9k_minigun":false,"m9k_davy_crocket":false}}}]
     -- ]==]
-    UserGroupManager\deserialize exampleJson
+    UserGroupManager\Deserialize exampleJson
 
     groups = { "1", "2", "3", "4" }
 
@@ -37,7 +37,7 @@ exampleGroupCreation = () ->
     print "regular davy crocket", regular\isAllowed "WEAPON", "m9k_davy_crocket"
     print "regular random gun", regular\isAllowed "WEAPON", "random_gun"
 
-    print UserGroupManager\serialize!
+    print UserGroupManager\Serialize!
 
 -- exampleGroupCreation!
 exampleDeserialize!
