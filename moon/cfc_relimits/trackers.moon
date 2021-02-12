@@ -1,7 +1,5 @@
--- TODO: Set/lua/betterchat/shared/sh_util.hc up the trackers on player spawn
-import min from math
-
-min: mathMin = math
+-- TODO: Set up the trackers on player spawn
+min = math.min
 
 class LimitTypeTrackerManager =>
     -- TODO: Should this get the group from the player?
