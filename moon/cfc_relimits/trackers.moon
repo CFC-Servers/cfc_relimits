@@ -1,6 +1,6 @@
 mathMin = math.min
 
-class LimitTypeTrackerManager =>
+class LimitTypeTrackerManager
     new: (@ply) =>
         if ply.TrackerManager
             error "Attempted to add second tracker manager to player " .. tostring ply
@@ -101,7 +101,7 @@ class LimitTypeTracker
 
         out = {}
 
-        for i, limitData in pairs limitDataList
+        for i, limitData in pairs limitDataList do
             :timeFrame, max: maxCount = limitData
             current = currents[i] or 0
             timeFrameStart = timeFrameStarts[i] or 0

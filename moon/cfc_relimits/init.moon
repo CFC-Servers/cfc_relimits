@@ -6,7 +6,7 @@ ReLimits.Utils =
 
     istable: (v) -> type(v) == "table"
 
-    newUUID : ->
+    newUUID: ->
         bytes = {}
         for i = 1, 16 do
             bytes[i] = math.random(1, 256)
