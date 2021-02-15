@@ -8,8 +8,15 @@ class LimitGroup
         @limits = {}
 
     updateLimits: (limits) =>
+        for uuid, limit in pairs limits
+            limit.uuid = uuid
         @limits = tableMerge @limits, limits
 
+    updateLimit: (limit, itemName) =>
+        @limits[itemName] or= {}
+        limit.uuid or= ReLimits.Utils.newUUID!
+        @limits[itemName][limit.uuid] = limit
+
     getLimit: (itemName) =>
-        -- [{ max: int, timeFrame: seconds }]
+        -- {uuid : { max: int, timeFrame: seconds }}
         @limits[itemName]

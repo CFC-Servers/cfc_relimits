@@ -3,6 +3,11 @@
 --when the compiledLimits table is created, merge over that uuid (using the uuid as the key),
 --this will mean changing any code that uses the limits list, or discard the uuid after the limits are compiled (but still store the uuid in the limit)
 
+-- uh oh, cant do above as we need the uuid until the end, instead change trackers
+-- trackers will now need to iterate the limits using pairs, which is slow, so perhaps instead we cache the keys somewhere so we can use a numeric iterator?
+-- who knows
+-- :)
+
 class UserGroupManager
     @groups: {}
     @nameLookup: {}
@@ -72,11 +77,22 @@ class UserGroup
         table.insert @parent.children, self
 
     updateLimits: (limitType, limits) =>
-        limitGroups = @limits[limitType]
-        return unless limitGroups
+        limitGroup = @limits[limitType]
+        return unless limitGroup
 
-        limitGroups\updateLimits limits
+        limitGroup\updateLimits limits
 
+        @clearCompiled!
+
+    addLimit: (limitType, identifier, limit) =>
+        limitGroup = @limits[limitType]
+        return unless limitGroup
+
+        limitGroup\addLimit limit, identifier
+
+        @clearCompiled!
+
+    clearCompiled: () ->
         return unless @children
 
         for child in *@children
@@ -87,6 +103,7 @@ class UserGroup
 
         parentLimits = @parent and @parent\getLimits!
         compiledLimits = tableMerge (parentLimits or {}), @limits
+
         @compiledLimits = compiledLimits
 
         return compiledLimits
