@@ -1,9 +1,15 @@
+require "cfclogger"
+
+export ReLimits = {}
+ReLimits.Logger = CFCLogger "ReLimits"
+
 includeShared = (file) ->
     AddCSLuaFile file
     include file
 
-includeShared "cfc_relimits/group_limits.moon"
+if SERVER
+    for f in *Find "cfc_relimits/core/*.lua", "LUA"
+        include f
 
-include "cfc_relimits/sv_hooks.lua" if SERVER
-
-
+    for f in *Find "cfc_relimits/limits/*.lua", "LUA"
+        include f

@@ -8,7 +8,10 @@
 -- who knows
 -- :)
 
-class UserGroupManager
+import Merge, insert from table
+import TableToJSON from util
+
+class ReLimits.UserGroupManager
     @groups: {}
     @nameLookup: {}
 
@@ -31,14 +34,14 @@ class UserGroupManager
         groups = {}
 
         for _, group in pairs @groups
-            table.insert groups, {
+            insert groups, {
                 uuid: group.uuid
                 name: group.name
                 inherits: group.parent and group.parent.uuid
                 limits: { k, v.limits for k, v in pairs group.limits }
             }
 
-        json.encode groups
+        TableToJSON groups
 
     Deserialize: (data) =>
         decodedData = json.decode data
@@ -47,7 +50,7 @@ class UserGroupManager
 
         for _, groupData in pairs decodedData
             parent = groupData.inherits and @groups[groupData.inherits]
-            newGroup = UserGroup groupData.name, parent, groupData.uuid
+            newGroup = ReLimits.UserGroup groupData.name, parent, groupData.uuid
 
             -- load limits
             for limitType, limits in pairs groupData.limits
@@ -62,19 +65,19 @@ class UserGroupManager
             if onLoaded[newGroup.uuid]
                 onLoaded[newGroup.uuid] newGroup
 
-class UserGroup
+class ReLimits.UserGroup
     new: (@name, @parent, @uuid=newUUID!, @limits=@generateLimits!) =>
-        UserGroupManager\Register @uuid, self
+        ReLimits.UserGroupManager\Register @uuid, self
         @compiledLimits = nil
 
     generateLimits: =>
         -- TODO: Give these to the user group on creation - it shouldn't have to do this
-        { limitType, LimitGroup limitType for limitType in pairs LimitGroup.limitTypes }
+        { limitType, ReLimits.LimitGroup limitType for limitType in pairs ReLimits.LimitGroup.limitTypes }
 
     setParent: (parent) =>
         @parent = parent
         @parent.children or= {}
-        table.insert @parent.children, self
+        insert @parent.children, self
 
     updateLimits: (limitType, limits) =>
         limitGroup = @limits[limitType]
@@ -102,7 +105,7 @@ class UserGroup
         return @compiledLimits if @compiledLimits
 
         parentLimits = @parent and @parent\getLimits!
-        compiledLimits = tableMerge (parentLimits or {}), @limits
+        compiledLimits = Merge (parentLimits or {}), @limits
 
         @compiledLimits = compiledLimits
 

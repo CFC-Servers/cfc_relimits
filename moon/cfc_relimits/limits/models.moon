@@ -23,10 +23,12 @@ hook.Add "OnEntityCreated", "ReLimits_IncrementModels", (ent) ->
         model = ent\GetModel!
         return unless model
 
-        tracker = ply.TrackerManager\getTracker "MODEL"
-        tracker\incr model
+        trackers = ply.TrackerManager\getTracker "MODEL"
+        for tracker in *trackers
+            tracker\incr model
 
         ent\CallOnRemove "ReLimits_IncrementModels", ->
-            tracker\decr model
+            for tracker in *trackers
+                tracker\decr model
 
     return nil
