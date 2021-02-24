@@ -17,5 +17,6 @@ hook.Add "WeaponEquip", "ReLimits_IncrWeapon", (wep, ply) ->
     return unless IsValid ply
     weaponClass = ply\GetClass!
 
-    tracker = ply.TrackerManager\getTracker "WEAPON"
-    tracker\incr weaponClass
+    trackers = ply.TrackerManager\getTracker "WEAPON"
+    for uuid, tracker in pairs trackers
+        tracker\incr weaponClass

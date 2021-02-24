@@ -1,4 +1,4 @@
-class LimitGroup
+class ReLimits.LimitGroup
     @limitTypes = {}
 
     Register: (limitType, comparator, default) =>

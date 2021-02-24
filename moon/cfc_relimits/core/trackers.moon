@@ -1,6 +1,6 @@
 mathMin = math.min
 
-class LimitTypeTrackerManager
+class ReLimits.LimitTypeTrackerManager
     new: (@ply) =>
         if ply.TrackerManager
             error "Attempted to add second tracker manager to player " .. tostring ply
@@ -19,7 +19,7 @@ class LimitTypeTrackerManager
     getLimit: (limitType, identifier) =>
         UserGroupManager\GetPlayerLimits(@ply)\getLimits![limitType][identifier]
 
-class LimitTypeTracker
+class ReLimits.LimitTypeTracker
     new: (@limitType, @manager) =>
         @counts = {}
         @timeFrameStarts = {}
@@ -115,7 +115,7 @@ class LimitTypeTracker
         out
 
 hook.Add "PlayerInitialSpawn", "ReLimits_CreateTrackerManager", (ply) ->
-    manager = LimitTypeTrackerManager ply
+    manager = ReLimits.LimitTypeTrackerManager ply
 
     for limitType in pairs LimitGroup.limitTypes
-        LimitTypeTracker limitType, manager
+        ReLimits.LimitTypeTracker limitType, manager
