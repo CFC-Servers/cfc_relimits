@@ -1,14 +1,10 @@
 canTool = (ply, _, toolName) ->
     return unless IsValid ply
-    trackers = ply.TrackerManager\getTracker "TOOL"
+    tracker = ply.TrackerManager\getTracker "TOOL"
 
-    for tracker in *trackers
-        counts = tracker\getCounts toolName
-        if counts.max and counts.current >= counts.max
-            return false
+    return false unless tracker\isAllowed toolName
 
-    for tracker in *trackers
-        tracker\incr toolName
+    tracker\incr toolName
 
     return nil
 

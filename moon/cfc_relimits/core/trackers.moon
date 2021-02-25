@@ -7,9 +7,6 @@ class ReLimits.LimitTypeTrackerManager
         ply.TrackerManager = @
         @typeTrackers = {}
 
-    -- TODO: Should these getters/setters have "tracker" in the name?
-    -- Is this doing too much?
-    -- Stinky code smell?
     addTracker: (trackerType, tracker) =>
         @typeTrackers[trackerType] = tracker
 
@@ -71,7 +68,6 @@ class ReLimits.LimitTypeTracker
         timeFrameStarts = @timeFrameStarts[identifier] or {}
 
         allowed = nil
-
         curTime = CurTime!
 
         for i = 1, #limitDataList
@@ -87,7 +83,7 @@ class ReLimits.LimitTypeTracker
 
             allowed = comparator (mathMin current, maxCount), maxCount
 
-            false if not allowed
+            return false if not allowed
 
         allowed or default
 
