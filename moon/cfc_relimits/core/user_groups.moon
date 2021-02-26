@@ -1,13 +1,3 @@
---TODO: Fix inheritance for multiple limits
---provide an interface for adding a limit, which will ensure a uuid is specified for that limit
---when the compiledLimits table is created, merge over that uuid (using the uuid as the key),
---this will mean changing any code that uses the limits list, or discard the uuid after the limits are compiled (but still store the uuid in the limit)
-
--- uh oh, cant do above as we need the uuid until the end, instead change trackers
--- trackers will now need to iterate the limits using pairs, which is slow, so perhaps instead we cache the keys somewhere so we can use a numeric iterator?
--- who knows
--- :)
-
 import Merge, insert from table
 import TableToJSON from util
 
