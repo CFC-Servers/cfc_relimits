@@ -87,6 +87,9 @@ class ReLimits.LimitTypeTracker
 
         allowed or default
 
+    isAllowedWild: (identifier) =>
+        @isAllowed(identifier) and @isAllowed("*")
+
     getCounts: (identifier) =>
         limitDataList = @getLimitData!
 

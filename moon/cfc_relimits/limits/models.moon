@@ -5,11 +5,9 @@ hook.Add "PlayerSpawnObject", "ReLimits_CanSpawn", (ply, model) ->
 
     tracker = ply.TrackerManager\getTracker "MODEL"
 
-    --TODO: Does the end user do this themselves? or does isAllowed check "*" implicitly
-    allowed = tracker\isAllowed model
-    allowedWild = tracker\isAllowed "*"
+    allowed = tracker\isAllowedWild model
 
-    return false if not (allowed and allowedWild)
+    return false if not allowed
 
     return nil
 
