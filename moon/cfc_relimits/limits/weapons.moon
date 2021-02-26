@@ -1,12 +1,11 @@
-LimitGroup.Register "WEAPON", (current, max) -> current < max, true
+LimitGroup.Register "WEAPON"
 
 canUseWeapon = (ply, weaponClass) ->
     return unless IsValid ply
     tracker = ply.TrackerManager\getTracker "WEAPON"
 
-    allowed = tracker\isAllowed weaponClass
-    allowedWild = tracker\isAllowed "*"
-    return false if not (allowed or allowedWild)
+    allowed = tracker\isAllowedWild weaponClass
+    return false if not allowed
 
     return nil
 

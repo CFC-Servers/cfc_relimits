@@ -1,7 +1,12 @@
 class ReLimits.LimitGroup
     @limitTypes = {}
 
-    Register: (limitType, comparator, default) =>
+    LT: (current, max) -> current < max
+    LE: (current, max) -> current <= max
+    GT: (current, max) -> current > max
+    GE: (current, max) -> current >= max
+
+    Register: (limitType, comparator=@LT, default=true) =>
         @limitTypes[limitType] = :comparator, :default
 
     new: (@limitType) =>
