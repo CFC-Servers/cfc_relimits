@@ -68,7 +68,7 @@ class ReLimits.UserGroupManager
 class ReLimits.UserGroup
     new: (@name, @parent, @uuid=newUUID!, @limits=@generateLimits!) =>
         ReLimits.UserGroupManager\Register @uuid, self
-        @compiledLimits = nil
+        @compiledLimitsData = nil
 
     generateLimits: =>
         -- TODO: Give these to the user group on creation - it shouldn't have to do this
@@ -99,14 +99,20 @@ class ReLimits.UserGroup
         return unless @children
 
         for child in *@children
-            child.compiledLimits = nil
+            child.compiledLimitsData = nil
+
+    getLimitsData: () =>
+        return @compiledLimitsData if @compiledLimitsData
+
+        parentLimitsData = @parent and @parent\getLimitsRaw!
+        compiledLimitsMap = Merge (parentLimitsData.map or {}), @limits
+        compiledLimitsList = [ v for _, v in pairs compiledLimitsMap ]
+
+        @compiledLimitsData =
+            map: compiledLimitsMap
+            list: compiledLimitsList
+
+        return compiledLimitsData
 
     getLimits: () =>
-        return @compiledLimits if @compiledLimits
-
-        parentLimits = @parent and @parent\getLimits!
-        compiledLimits = Merge (parentLimits or {}), @limits
-
-        @compiledLimits = compiledLimits
-
-        return compiledLimits
+        @getLimitsData!.list
