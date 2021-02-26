@@ -91,12 +91,25 @@ class ReLimits.UserGroup
         for child in *@children
             child.compiledLimitsData = nil
 
+    generateCompiledLimitsList: (limitsMap) =>
+        -- we need to make all limits at limitsMap[limitType][identifier] into a sequential list of limits
+        --      rather than a limitsMap[limitType][identifier][uuid] = limit structure
+        -- this will be slow, but this part of the function only occurs if limits change, so is on demand
+        -- This is essentially a clone + conversion in one, for efficiency
+        out = {}
+        for limitType, limitData in pairs limitsMap
+            newLimitData = {}
+            for identifier, limits in pairs limitData
+                newLimitData[identifier] = [ v for _, v in pairs limits ]
+            out[limitType] = newLimitData
+        out
+
     getLimitsData: () =>
         return @compiledLimitsData if @compiledLimitsData
 
         parentLimitsData = @parent and @parent\getLimitsRaw!
         compiledLimitsMap = Merge (parentLimitsData.map or {}), @limits
-        compiledLimitsList = [ v for _, v in pairs compiledLimitsMap ]
+        compiledLimitsList = @generateCompiledLimitsList compiledLimitsMap
 
         @compiledLimitsData =
             map: compiledLimitsMap
