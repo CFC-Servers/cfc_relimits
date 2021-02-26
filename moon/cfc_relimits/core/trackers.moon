@@ -106,7 +106,10 @@ class ReLimits.LimitTypeTracker
                 current = 0
                 currents[i] = 0
 
-            out[i] = current: (mathMin current, maxCount), max: maxCount
+            out[i] =
+                current: (mathMin current, maxCount)
+                max: maxCount
+                :limitData
 
         out
 
