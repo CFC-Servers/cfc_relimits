@@ -108,6 +108,8 @@ class ReLimits.UserGroup
         return @compiledLimitsData if @compiledLimitsData
 
         parentLimitsData = @parent and @parent\getLimitsRaw!
+        -- TODO, limits here is a map from limitType to limitGroup, but here we're treating it like a map from limitType to limitGroup.limits
+        -- needs fixing somehow 
         compiledLimitsMap = Merge (parentLimitsData.map or {}), @limits
         compiledLimitsList = @generateCompiledLimitsList compiledLimitsMap
 

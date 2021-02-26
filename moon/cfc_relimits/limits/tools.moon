@@ -1,3 +1,5 @@
+LimitGroup.Register "TOOL"
+
 canTool = (ply, _, toolName) ->
     return unless IsValid ply
     tracker = ply.TrackerManager\getTracker "TOOL"

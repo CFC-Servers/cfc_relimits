@@ -1,12 +1,10 @@
-LimitGroup.Register "MODEL", (current, max) -> current < max, true
+LimitGroup.Register "MODEL"
 
 hook.Add "PlayerSpawnObject", "ReLimits_CanSpawn", (ply, model) ->
     return unless model
-
     tracker = ply.TrackerManager\getTracker "MODEL"
 
     allowed = tracker\isAllowedWild model
-
     return false if not allowed
 
     return nil
