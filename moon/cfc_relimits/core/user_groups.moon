@@ -12,6 +12,11 @@ class ReLimits.UserGroupManager
     GetPlayerLimits: (ply) =>
         --TODO: What do we do if we don't have a group object for this team, fallback to user? ensure it never happens?
         group = @GetUserGroup @GetUserGroupName ply
+
+        if not group
+            ReLimits.Logger\error "Found no group associated with player:", ply
+            error!
+
         group and group\getLimits!
 
     GetUserGroupName: (ply) =>
