@@ -1,5 +1,6 @@
 import Merge, insert from table
 import JSONToTable, TableToJSON from util
+import Read, CreateDir, Write from file
 
 DATA_FILENAME = "relimits/limits.json"
 
@@ -35,11 +36,11 @@ class ReLimits.UserGroupManager
 
         dataDirectory = table.concat splitFilename, "/"
 
-        file.CreateDir dataDirectory
-        file.Write DATA_FILENAME, @Serialize!
+        CreateDir dataDirectory
+        Write DATA_FILENAME, @Serialize!
 
     Load: () =>
-        data = file.Read( DATA_FILENAME, "DATA" )
+        data = Read DATA_FILENAME, "DATA" 
         return unless content
 
         @Deserialzie data
