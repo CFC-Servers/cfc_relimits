@@ -4,7 +4,7 @@ import time from os
 
 randomseed time!
 
-export ReLimits = {}
+export ReLimits or= {}
 ReLimits.Utils =
     newUUID: ->
         bytes = {}
