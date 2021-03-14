@@ -1,4 +1,4 @@
-LimitGroup.Register "MODEL"
+ReLimits.LimitGroup\Register "MODEL"
 
 hook.Add "PlayerSpawnObject", "ReLimits_CanSpawn", (ply, model) ->
     return unless model

@@ -1,4 +1,4 @@
-LimitGroup.Register "TOOL"
+ReLimits.LimitGroup\Register "TOOL"
 
 canTool = (ply, _, toolName) ->
     return unless IsValid ply
