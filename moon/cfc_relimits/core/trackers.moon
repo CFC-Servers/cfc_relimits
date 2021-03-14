@@ -1,10 +1,12 @@
+import Logger from ReLimits
 mathMin = math.min
 
 class ReLimits.LimitTypeTrackerManager
     new: (@ply) =>
         if ply.TrackerManager
-            error "Attempted to add second tracker manager to player " .. tostring ply
-        ply.TrackerManager = @
+            Logger\error "Attempted to add second tracker manager to player #{ply}"
+
+        ply.TrackerManager = self
         @typeTrackers = {}
 
     addTracker: (trackerType, tracker) =>
@@ -20,13 +22,15 @@ class ReLimits.LimitTypeTracker
     new: (@limitType, @manager) =>
         @counts = {}
         @timeFrameStarts = {}
-        @manager\addTracker @limitType, @
+        @manager\addTracker @limitType, self
 
     set: (identifier, value) =>
         limitDataList = @getLimitData!
         currentCounts = @counts[identifier] or {}
+
         for i = 1, #limitDataList
             currentCounts[i] = value
+
         @counts[identifier] = currentCounts
 
     change: (identifier, amount) =>
