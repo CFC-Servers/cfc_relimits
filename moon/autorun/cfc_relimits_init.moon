@@ -10,8 +10,11 @@ includeShared = (file) ->
     include file
 
 if SERVER
-    for f in *Find "cfc_relimits/core/*.lua", "LUA"
-        include f
+    scopes = {
+        "cfc_relimits/core"
+        "cfc_relimits/limits"
+    }
 
-    for f in *Find "cfc_relimits/limits/*.lua", "LUA"
-        include f
+    for scope in *scopes
+        for f in *Find "#{scope}/*.lua", "LUA"
+            include "#{scope}/#{f}"
