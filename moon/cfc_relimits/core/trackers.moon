@@ -66,7 +66,7 @@ class ReLimits.LimitTypeTracker
     isAllowed: (identifier) =>
         limitDataList = @getLimitData!
 
-        :comparator, :default = LimitGroup.limitTypes[@limitType]
+        :comparator, :default = ReLimits.LimitGroup.limitTypes[@limitType]
 
         currents = @counts[identifier] or {}
         timeFrameStarts = @timeFrameStarts[identifier] or {}
@@ -123,5 +123,5 @@ class ReLimits.LimitTypeTracker
 hook.Add "PlayerInitialSpawn", "ReLimits_CreateTrackerManager", (ply) ->
     manager = ReLimits.LimitTypeTrackerManager ply
 
-    for limitType in pairs LimitGroup.limitTypes
+    for limitType in pairs ReLimits.LimitGroup.limitTypes
         ReLimits.LimitTypeTracker limitType, manager
