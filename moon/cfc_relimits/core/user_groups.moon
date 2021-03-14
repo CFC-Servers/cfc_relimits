@@ -1,5 +1,7 @@
 import Merge, insert from table
-import TableToJSON from util
+import JSONToTable, TableToJSON from util
+
+DATA_FILENAME = "relimits/limits.json"
 
 class ReLimits.UserGroupManager
     @groups: {}
@@ -25,6 +27,23 @@ class ReLimits.UserGroupManager
     GetUserGroup: (groupIdentifier) =>
         @groups[groupIdentifier] or @nameLookup[groupIdentifier]
 
+    Save: () =>
+        data = @Serialize!
+
+        splitFilename = string.Split DATA_FILENAME
+        splitFilename[#splitFilename] = nil
+
+        dataDirectory = table.concat splitFilename, "/"
+
+        file.CreateDir dataDirectory
+        file.Write DATA_FILENAME, @Serialize!
+
+    Load: () =>
+        data = file.Read( DATA_FILENAME, "DATA" )
+        return unless content
+
+        @Deserialzie data
+
     Serialize: () =>
         groups = {}
 
@@ -39,7 +58,7 @@ class ReLimits.UserGroupManager
         TableToJSON groups
 
     Deserialize: (data) =>
-        decodedData = json.decode data
+        decodedData = JSONToTable data
 
         onLoaded = {}
 
@@ -59,6 +78,8 @@ class ReLimits.UserGroupManager
 
             if onLoaded[newGroup.uuid]
                 onLoaded[newGroup.uuid] newGroup
+
+hook.Add "Initialize", "CFC_ReLimits_LoadLimits", ReLimits.UserGroupManager\Load
 
 class ReLimits.UserGroup
     new: (@name, @parent, @uuid=newUUID!, @limits=@generateLimits!) =>
@@ -81,6 +102,7 @@ class ReLimits.UserGroup
         limitGroup\updateLimits limits
 
         @clearCompiled!
+        ReLimits.UserGroupManager\Save!
 
     addLimit: (limitType, identifier, limit) =>
         limitGroup = @limits[limitType]
@@ -89,6 +111,7 @@ class ReLimits.UserGroup
         limitGroup\addLimit limit, identifier
 
         @clearCompiled!
+        ReLimits.UserGroupManager\Save!
 
     clearCompiled: () ->
         return unless @children
