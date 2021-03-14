@@ -1,4 +1,4 @@
-LimitGroup.Register "WEAPON"
+ReLimits.LimitGroup\Register "WEAPON"
 
 canUseWeapon = (ply, weaponClass) ->
     return unless IsValid ply
