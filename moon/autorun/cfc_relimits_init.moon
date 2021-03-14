@@ -3,6 +3,7 @@ import Find from file
 
 export ReLimits = {}
 ReLimits.Logger = CFCLogger "ReLimits"
+ReLimits.Logger\on("error")\call(error)
 
 includeShared = (file) ->
     AddCSLuaFile file

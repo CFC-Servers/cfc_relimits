@@ -1,6 +1,7 @@
 import Merge, insert from table
 import JSONToTable, TableToJSON from util
 import Read, CreateDir, Write from file
+import Logger from ReLimits
 
 DATA_FILENAME = "relimits/limits.json"
 
@@ -9,15 +10,15 @@ class ReLimits.UserGroupManager
     @nameLookup: {}
 
     Register: (uuid, group) =>
+        Logger\debug "Registering '#{uuid}':", group
         @groups[uuid] = group
         @nameLookup[group.name] = group
 
     GetPlayerLimits: (ply) =>
-        --TODO: What do we do if we don't have a group object for this team, fallback to user? ensure it never happens?
         group = @GetUserGroup @GetUserGroupName ply
 
         if not group
-            ReLimits.Logger\error "Found no group associated with player:", ply
+            Logger\error "Found no group associated with player:", ply
             error!
 
         group and group\getLimits!
@@ -40,7 +41,7 @@ class ReLimits.UserGroupManager
         Write DATA_FILENAME, @Serialize!
 
     Load: () =>
-        data = Read DATA_FILENAME, "DATA" 
+        data = Read DATA_FILENAME, "DATA"
         return unless content
 
         @Deserialzie data
@@ -56,10 +57,15 @@ class ReLimits.UserGroupManager
                 limits: { k, v.limits for k, v in pairs group.limits }
             }
 
-        TableToJSON groups
+        serialized = TableToJSON groups
+        Logger\debug "Serialized:", serialized
+
+        serialized
 
     Deserialize: (data) =>
         decodedData = JSONToTable data
+        Logger\debug "Data:", data
+        Logger\debug "Decoded Data:", decodedData
 
         onLoaded = {}
 
@@ -79,6 +85,9 @@ class ReLimits.UserGroupManager
 
             if onLoaded[newGroup.uuid]
                 onLoaded[newGroup.uuid] newGroup
+
+        Logger\debug "Deserialized:", onLoaded
+        onLoaded
 
 hook.Add "Initialize", "CFC_ReLimits_LoadLimits", ReLimits.UserGroupManager\Load
 
@@ -106,8 +115,12 @@ class ReLimits.UserGroup
         ReLimits.UserGroupManager\Save!
 
     addLimit: (limitType, identifier, limit) =>
+        Logger\debug "Attempting to add limit '#{limitType}' with identifier: #{identifier}:", limit
+
         limitGroup = @limits[limitType]
         return unless limitGroup
+
+        Logger\debug "Adding limit '#{limitType}' with identifier: #{identifier}"
 
         limitGroup\addLimit limit, identifier
 
@@ -121,24 +134,29 @@ class ReLimits.UserGroup
             child.compiledLimitsData = nil
 
     generateCompiledLimitsList: (limitsMap) =>
-        -- we need to make all limits at limitsMap[limitType][identifier] into a sequential list of limits
-        --      rather than a limitsMap[limitType][identifier][uuid] = limit structure
-        -- this will be slow, but this part of the function only occurs if limits change, so is on demand
-        -- This is essentially a clone + conversion in one, for efficiency
         out = {}
+
         for limitType, limitData in pairs limitsMap
             newLimitData = {}
+
             for identifier, limits in pairs limitData
                 newLimitData[identifier] = [ v for _, v in pairs limits ]
+
             out[limitType] = newLimitData
+
         out
+
+    getLimitsRaw: () =>
+        {
+            map: @limits,
+            list: @generateCompiledLimitsList @limits
+        }
 
     getLimitsData: () =>
         return @compiledLimitsData if @compiledLimitsData
 
         parentLimitsData = @parent and @parent\getLimitsRaw!
-        -- TODO, limits here is a map from limitType to limitGroup, but here we're treating it like a map from limitType to limitGroup.limits
-        -- needs fixing somehow 
+
         compiledLimitsMap = Merge (parentLimitsData.map or {}), @limits
         compiledLimitsList = @generateCompiledLimitsList compiledLimitsMap
 
@@ -150,3 +168,4 @@ class ReLimits.UserGroup
 
     getLimits: () =>
         @getLimitsData!.list
+
