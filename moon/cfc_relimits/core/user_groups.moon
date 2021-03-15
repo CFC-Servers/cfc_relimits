@@ -157,8 +157,9 @@ class ReLimits.UserGroup
         return @compiledLimitsData if @compiledLimitsData
 
         parentLimitsData = @parent and @parent\getLimitsRaw!
+        parentLimitsDataMap = parentLimitsData and parentLimitsData.map or {}
 
-        compiledLimitsMap = Merge (parentLimitsData.map or {}), @limits
+        compiledLimitsMap = Merge parentLimitsData, @limits
         compiledLimitsList = @generateCompiledLimitsList compiledLimitsMap
 
         @compiledLimitsData =
