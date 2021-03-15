@@ -9,7 +9,7 @@ canUseWeapon = (ply, weaponClass) ->
 
     return nil
 
-hook.Add "PlayerCanPickupWeapon", "ReLimits_CanPickup", (ply, weapon) ->
+hook.Add "PlayerCanPickupWeapon", "ReLimits_CanPickup", (ply, wep) ->
     canUseWeapon ply, wep\GetClass!
 
 hook.Add "WeaponEquip", "ReLimits_IncrWeapon", (wep, ply) ->
