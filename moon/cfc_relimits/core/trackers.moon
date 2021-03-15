@@ -3,10 +3,10 @@ mathMin = math.min
 
 class ReLimits.LimitTypeTrackerManager
     new: (@ply) =>
-        if ply.TrackerManager
+        if @ply.TrackerManager
             Logger\error "Attempted to add second tracker manager to player #{ply}"
 
-        ply.TrackerManager = self
+        @ply.TrackerManager = self
         @typeTrackers = {}
 
     addTracker: (trackerType, tracker) =>
