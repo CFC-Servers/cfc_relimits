@@ -19,8 +19,8 @@ class ReLimits.UserGroupManager
         group = @GetUserGroup @GetUserGroupName ply
 
         if not group
-            Logger\error "Found no group associated with player:", ply
-            error!
+            Logger\info "Found no group associated with player:", ply
+            return
 
         group and group\getLimits!
 
