@@ -141,7 +141,7 @@ class ReLimits.UserGroup
             newLimitData = {}
 
             for identifier, limits in pairs limitData
-                newLimitData[identifier] = [ v for _, v in pairs limits ]
+                newLimitData[identifier] = [ v for _, v in pairs @limits ]
 
             out[limitType] = newLimitData
 
@@ -158,8 +158,8 @@ class ReLimits.UserGroup
 
         parentLimitsData = @parent and @parent\getLimitsRaw!
         parentLimitsDataMap = parentLimitsData and parentLimitsData.map or {}
-
-        compiledLimitsMap = Merge parentLimitsData, @limits
+        
+        compiledLimitsMap = Merge parentLimitsDataMap, @limits
         compiledLimitsList = @generateCompiledLimitsList compiledLimitsMap
 
         @compiledLimitsData =

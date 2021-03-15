@@ -26,6 +26,7 @@ class ReLimits.LimitTypeTracker
 
     set: (identifier, value) =>
         limitDataList = @getLimitData!
+
         currentCounts = @counts[identifier] or {}
 
         for i = 1, #limitDataList
