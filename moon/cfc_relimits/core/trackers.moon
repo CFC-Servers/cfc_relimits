@@ -16,7 +16,7 @@ class ReLimits.LimitTypeTrackerManager
         @typeTrackers[trackerType]
 
     getLimitData: (limitType, identifier) =>
-        UserGroupManager\GetPlayerLimits(@ply)[limitType][identifier]
+        ReLimits.UserGroupManager\GetPlayerLimits(@ply)[limitType][identifier]
 
 class ReLimits.LimitTypeTracker
     new: (@limitType, @manager) =>
