@@ -2,6 +2,7 @@ import Merge, insert from table
 import JSONToTable, TableToJSON from util
 import Read, CreateDir, Write from file
 import Logger from ReLimits
+from ReLimits.Utils import newUUID
 
 DATA_FILENAME = "relimits/limits.json"
 
