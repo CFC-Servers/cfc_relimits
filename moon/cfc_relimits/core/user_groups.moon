@@ -1,4 +1,4 @@
-import Merge, insert from table
+import Merge, insert, Copy from table
 import JSONToTable, TableToJSON from util
 import Read, CreateDir, Write from file
 import Logger from ReLimits
@@ -137,11 +137,11 @@ class ReLimits.UserGroup
     generateCompiledLimitsList: (limitsMap) =>
         out = {}
 
-        for limitType, limitData in pairs limitsMap
+        for limitType, limitGroup in pairs limitsMap
             newLimitData = {}
 
-            for identifier, limits in pairs limitData
-                newLimitData[identifier] = [ v for _, v in pairs @limits ]
+            for identifier, limits in pairs limitGroup.limits
+                newLimitData[identifier] = [ v for _, v in pairs limits ]
 
             out[limitType] = newLimitData
 
@@ -156,10 +156,10 @@ class ReLimits.UserGroup
     getLimitsData: () =>
         return @compiledLimitsData if @compiledLimitsData
 
-        parentLimitsData = @parent and @parent\getLimitsRaw!
+        parentLimitsData = @parent and @parent\getLimitsData!
         parentLimitsDataMap = parentLimitsData and parentLimitsData.map or {}
-        
-        compiledLimitsMap = Merge parentLimitsDataMap, @limits
+
+        compiledLimitsMap = Merge (Copy parentLimitsDataMap), @limits
         compiledLimitsList = @generateCompiledLimitsList compiledLimitsMap
 
         @compiledLimitsData =
@@ -170,4 +170,3 @@ class ReLimits.UserGroup
 
     getLimits: () =>
         @getLimitsData!.list
-
