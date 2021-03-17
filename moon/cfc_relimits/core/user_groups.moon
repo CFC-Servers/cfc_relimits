@@ -167,7 +167,7 @@ class ReLimits.UserGroup
             map: compiledLimitsMap
             list: compiledLimitsList
 
-        return compiledLimitsData
+        return @compiledLimitsData
 
     getLimits: () =>
         @getLimitsData!.list
