@@ -43,9 +43,7 @@ class ReLimits.UserGroupManager
 
     Load: () =>
         data = Read DATA_FILENAME, "DATA"
-        return unless content
-
-        @Deserialize data
+        @Deserialize data if data
 
         if not @GetUserGroup DEFAULT_GROUP_NAME
             ReLimits.UserGroup DEFAULT_GROUP_NAME
