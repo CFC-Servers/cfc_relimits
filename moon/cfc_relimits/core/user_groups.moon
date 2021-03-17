@@ -59,7 +59,7 @@ class ReLimits.UserGroupManager
                 limits: { k, v.limits for k, v in pairs group.limits }
             }
 
-        serialized = TableToJSON groups
+        serialized = TableToJSON groups, true
         Logger\debug "Serialized:", serialized
 
         serialized
