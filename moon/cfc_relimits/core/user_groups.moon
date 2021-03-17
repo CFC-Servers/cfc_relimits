@@ -5,6 +5,7 @@ import Logger from ReLimits
 import newUUID from ReLimits.Utils
 
 DATA_FILENAME = "relimits/limits.json"
+DEFAULT_GROUP_NAME = "_DEFAULT"
 
 class ReLimits.UserGroupManager
     @groups: {}
@@ -15,12 +16,11 @@ class ReLimits.UserGroupManager
         @groups[uuid] = group
         @nameLookup[group.name] = group
 
+        @Save!
+
     GetPlayerLimits: (ply) =>
         group = @GetUserGroup @GetUserGroupName ply
-
-        if not group
-            Logger\info "Found no group associated with player:", ply
-            return
+        group or= @GetUserGroup DEFAULT_GROUP_NAME
 
         group and group\getLimits!
 
@@ -46,6 +46,9 @@ class ReLimits.UserGroupManager
         return unless content
 
         @Deserialzie data
+
+        if not @GetUserGroup DEFAULT_GROUP_NAME
+            ReLimits.UserGroup DEFAULT_GROUP_NAME
 
     Serialize: () =>
         groups = {}
