@@ -45,7 +45,7 @@ class ReLimits.UserGroupManager
         data = Read DATA_FILENAME, "DATA"
         return unless content
 
-        @Deserialzie data
+        @Deserialize data
 
         if not @GetUserGroup DEFAULT_GROUP_NAME
             ReLimits.UserGroup DEFAULT_GROUP_NAME
