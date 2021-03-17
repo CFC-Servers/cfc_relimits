@@ -25,7 +25,8 @@ class ReLimits.LimitTypeTracker
         @manager\addTracker @limitType, self
 
     set: (identifier, value) =>
-        limitDataList = @getLimitData!
+        limitDataList = @getLimitData identifier
+        return unless limitDataList
 
         currentCounts = @counts[identifier] or {}
 
@@ -40,7 +41,8 @@ class ReLimits.LimitTypeTracker
 
         curTime = CurTime!
 
-        limitDataList = @getLimitData!
+        limitDataList = @getLimitData identifier
+        return unless limitDataList
 
         currentCounts = @counts[identifier]
         for i = 1, #limitDataList
@@ -65,7 +67,7 @@ class ReLimits.LimitTypeTracker
         @manager\getLimitData @limitType, identifier
 
     isAllowed: (identifier) =>
-        limitDataList = @getLimitData!
+        limitDataList = @getLimitData identifier
 
         :comparator, :default = ReLimits.LimitGroup.limitTypes[@limitType]
 
@@ -98,7 +100,8 @@ class ReLimits.LimitTypeTracker
         @isAllowed(identifier) and @isAllowed("*")
 
     getCounts: (identifier) =>
-        limitDataList = @getLimitData!
+        limitDataList = @getLimitData identifier
+        return unless limitDataList
 
         currents = @counts[identifier] or {}
         timeFrameStarts = @timeFrameStarts[identifier] or {}
