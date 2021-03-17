@@ -27,7 +27,8 @@ class ReLimits.UserGroupManager
         return unless group
         group\clearCompiled!
 
-        for child in *@children
+        children = group.children or {}
+        for child in *children
             child\setParent group.parent
 
         @groups[uuid] = nil
