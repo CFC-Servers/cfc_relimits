@@ -129,7 +129,7 @@ class ReLimits.UserGroup
         @clearCompiled!
         ReLimits.UserGroupManager\Save!
 
-    clearCompiled: () ->
+    clearCompiled: () =>
         return unless @children
 
         for child in *@children
