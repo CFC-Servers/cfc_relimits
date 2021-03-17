@@ -23,14 +23,14 @@ class ReLimits.LimitGroup
 
         @limits = tableMerge @limits, limits
 
-    updateLimit: (limit, itemName) =>
-        @limits[itemName] or= {}
+    updateLimit: (identifier, limit) =>
+        @limits[identifier] or= {}
 
-        Logger\debug "Updating limit '#{itemName}'. Current: #{@limits[itemName]}", "Next: ", limit
+        Logger\debug "Updating limit '#{identifier}'. Current: #{@limits[identifier]}", "Next: ", limit
 
         limit.uuid or= ReLimits.Utils.newUUID!
-        @limits[itemName][limit.uuid] = limit
+        @limits[identifier][limit.uuid] = limit
 
-    getLimit: (itemName) =>
+    getLimit: (identifier) =>
         -- {uuid : { max: int, timeFrame: seconds }}
-        @limits[itemName]
+        @limits[identifier]

@@ -124,7 +124,7 @@ class ReLimits.UserGroup
 
         Logger\debug "Adding limit '#{limitType}' with identifier: #{identifier}"
 
-        limitGroup\addLimit limit, identifier
+        limitGroup\updateLimit identifier, limit
 
         @clearCompiled!
         ReLimits.UserGroupManager\Save!
