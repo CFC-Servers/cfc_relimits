@@ -140,6 +140,8 @@ class ReLimits.UserGroup
         ReLimits.UserGroupManager\Save!
 
     addLimit: (limitType, identifier, limit) =>
+        identifier = string.lower(identifier)
+
         Logger\debug "Attempting to add limit '#{limitType}' with identifier: #{identifier}:", limit
 
         limitGroup = @limits[limitType]

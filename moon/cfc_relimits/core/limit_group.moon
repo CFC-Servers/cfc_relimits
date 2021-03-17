@@ -24,6 +24,7 @@ class ReLimits.LimitGroup
         @limits = tableMerge @limits, limits
 
     updateLimit: (identifier, limit) =>
+        identifier = string.lower identifier
         @limits[identifier] or= {}
 
         Logger\debug "Updating limit '#{identifier}'. Current: #{@limits[identifier]}", "Next: ", limit
@@ -32,5 +33,6 @@ class ReLimits.LimitGroup
         @limits[identifier][limit.uuid] = limit
 
     getLimit: (identifier) =>
+        identifier = string.lower identifier
         -- {uuid : { max: int, timeFrame: seconds }}
         @limits[identifier]

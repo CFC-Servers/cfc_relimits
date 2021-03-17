@@ -16,6 +16,7 @@ class ReLimits.LimitTypeTrackerManager
         @typeTrackers[trackerType]
 
     getLimitData: (limitType, identifier) =>
+        identifier = string.lower identifier
         ReLimits.UserGroupManager\GetPlayerLimits(@ply)[limitType][identifier]
 
 class ReLimits.LimitTypeTracker
@@ -25,6 +26,7 @@ class ReLimits.LimitTypeTracker
         @manager\addTracker @limitType, self
 
     set: (identifier, value) =>
+        identifier = string.lower identifier
         limitDataList = @getLimitData identifier
         return unless limitDataList
 
@@ -36,6 +38,7 @@ class ReLimits.LimitTypeTracker
         @counts[identifier] = currentCounts
 
     change: (identifier, amount) =>
+        identifier = string.lower identifier
         return if amount == 0
         @counts[identifier] or= {}
 
@@ -64,9 +67,11 @@ class ReLimits.LimitTypeTracker
         @change identifier, -1
 
     getLimitData: (identifier) =>
+        identifier = string.lower identifier
         @manager\getLimitData @limitType, identifier
 
     isAllowed: (identifier) =>
+        identifier = string.lower identifier
         limitDataList = @getLimitData identifier
 
         :comparator, :default = ReLimits.LimitGroup.limitTypes[@limitType]
@@ -100,6 +105,7 @@ class ReLimits.LimitTypeTracker
         @isAllowed(identifier) and @isAllowed("*")
 
     getCounts: (identifier) =>
+        identifier = string.lower identifier
         limitDataList = @getLimitData identifier
         return unless limitDataList
 
