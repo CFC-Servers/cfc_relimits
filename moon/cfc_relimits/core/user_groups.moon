@@ -1,4 +1,4 @@
-import Merge, insert, Copy from table
+import Merge, insert, Copy, RemoveByValue from table
 import JSONToTable, TableToJSON from util
 import Read, CreateDir, Write from file
 import Logger from ReLimits
@@ -13,10 +13,25 @@ class ReLimits.UserGroupManager
 
     Register: (uuid, group) =>
         Logger\debug "Registering '#{uuid}':", group
+
+        old = @nameLookup[group.name]
+        old\remove! if old
+
         @groups[uuid] = group
         @nameLookup[group.name] = group
 
         @Save!
+
+    Remove: (uuid) =>
+        group = @groups[uuid]
+        return unless group
+        group\clearCompiled!
+
+        for child in *@children
+            child\setParent group.parent
+
+        @groups[uuid] = nil
+        @nameLookup[group.name] = nil
 
     GetPlayerLimits: (ply) =>
         group = @GetUserGroup @GetUserGroupName ply
@@ -98,12 +113,19 @@ class ReLimits.UserGroup
         ReLimits.UserGroupManager\Register @uuid, self
         @compiledLimitsData = nil
 
+    remove: () =>
+        ReLimits.UserGroupManager\Remove @uuid
+
     generateLimits: =>
         -- TODO: Give these to the user group on creation - it shouldn't have to do this
         { limitType, ReLimits.LimitGroup limitType for limitType in pairs ReLimits.LimitGroup.limitTypes }
 
     setParent: (parent) =>
+        RemoveByValue @parent.children, self if @parent
+
         @parent = parent
+        return unless parent
+
         @parent.children or= {}
         insert @parent.children, self
 
