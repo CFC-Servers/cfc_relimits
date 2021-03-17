@@ -69,6 +69,8 @@ class ReLimits.LimitTypeTracker
 
         :comparator, :default = ReLimits.LimitGroup.limitTypes[@limitType]
 
+        return default unless limitDataList
+
         currents = @counts[identifier] or {}
         timeFrameStarts = @timeFrameStarts[identifier] or {}
 
