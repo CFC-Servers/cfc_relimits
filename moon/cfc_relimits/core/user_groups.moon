@@ -33,7 +33,7 @@ class ReLimits.UserGroupManager
     Save: () =>
         data = @Serialize!
 
-        splitFilename = string.Split DATA_FILENAME
+        splitFilename = string.Split DATA_FILENAME, "/"
         splitFilename[#splitFilename] = nil
 
         dataDirectory = table.concat splitFilename, "/"
