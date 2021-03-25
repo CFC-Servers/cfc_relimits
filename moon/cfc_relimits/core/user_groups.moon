@@ -155,6 +155,7 @@ class ReLimits.UserGroup
         ReLimits.UserGroupManager\Save!
 
     clearCompiled: () =>
+        @compiledLimitsData = nil
         return unless @children
 
         for child in *@children
