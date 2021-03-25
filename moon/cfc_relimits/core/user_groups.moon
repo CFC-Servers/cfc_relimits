@@ -130,6 +130,7 @@ class ReLimits.UserGroup
         @parent.children or= {}
         insert @parent.children, self
 
+    -- TODO: how is this used
     updateLimits: (limitType, limits) =>
         limitGroup = @limits[limitType]
         return unless limitGroup

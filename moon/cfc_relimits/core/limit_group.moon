@@ -32,7 +32,7 @@ class ReLimits.LimitGroup
         limit.uuid or= ReLimits.Utils.newUUID!
         @limits[identifier][limit.uuid] = limit
 
+    -- FIXME: unused?
     getLimit: (identifier) =>
         identifier = string.lower identifier
-        -- {uuid : { max: int, timeFrame: seconds }}
         @limits[identifier]
