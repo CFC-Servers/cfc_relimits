@@ -1,8 +1,8 @@
-require "cfclogger"
+require "logger"
 import Find from file
 
 export ReLimits = {}
-ReLimits.Logger = CFCLogger "ReLimits"
+ReLimits.Logger = Logger "ReLimits"
 ReLimits.Logger\on("error")\call(error)
 
 includeShared = (file) ->
